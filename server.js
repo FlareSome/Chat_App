@@ -13,10 +13,13 @@ app.get('/', (req, res) => {
             'message': 'hello world'
   });
 });
-
+usr_cnt=0
 io.on('connection', (socket) => {
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+  usr_cnt++;
+  console.log(`user${usr_cnt}: joined`)
+  socket.on('chat_message', (msg) => {
+    console.log(msg)
+    io.emit('server_response', msg);
   });
 });
 

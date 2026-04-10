@@ -1,18 +1,30 @@
-import asyncio
-from websockets.asyncio.server import serve
+# client.py
+import socketio
 
-async def echo(websocket):
-    # Iterate over incoming messages
-    async for message in websocket:
-        print(f"Received: {message}")
-        # Send a message back
-        await websocket.send(f"Echo: {message}")
+# Create a Socket.io client instance
+sio = socketio.Client()
 
-async def main():
-    # Start the server on localhost at port 8765
-    async with serve(echo, "localhost", 8765) as server:
-        print("Server running on ws://localhost:8765")
-        await server.serve_forever()
+@sio.event
+def connect():
+    print("Successfully connected to the server!")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+@sio.event
+def disconnect():
+    print("Disconnected from server")
+
+# Listen for the 'server_response' event
+@sio.on("server_response")
+def on_message(data):
+    print("Server says:", data)
+
+# Connect to the Node.js server
+sio.connect("http://localhost:3000")
+
+# Emit a message to the 'chat_message' event
+sio.emit("chat_message", {"user": "Python", "text": "Hello from the other side!"})
+
+
+
+
+# Keep the connection alive
+sio.wait()
