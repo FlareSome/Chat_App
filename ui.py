@@ -73,7 +73,7 @@ def main(stdscr):
         chat_win.noutrefresh()
         input_win.noutrefresh()
         curses.doupdate()
-
+    
         try:
             key = stdscr.get_wch()
         except:
