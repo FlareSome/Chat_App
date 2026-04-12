@@ -1,4 +1,3 @@
-
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -16,7 +15,8 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+    // Broadcast the message to all other connected clients
+    socket.broadcast.emit('chat message', msg);
   });
 });
 

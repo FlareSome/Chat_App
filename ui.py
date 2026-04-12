@@ -1,6 +1,7 @@
 import curses
 from curses import wrapper
 import time
+import socketio
 
 def main(stdscr):
     # SETUP
@@ -16,6 +17,19 @@ def main(stdscr):
         "[system]: welcome to the chat",
         "[system]: type /help for commands"
     ]
+
+    # Initialize Socket.IO Client
+    sio = socketio.Client()
+    
+    @sio.on('chat message')
+    def on_message(msg):
+        messages.append(f"[them]: {msg}")
+        
+    try:
+        sio.connect('http://localhost:3000')
+        messages.append("[system]: connected to server")
+    except Exception as e:
+        messages.append(f"[system]: connection failed")
 
     current_input = ""
     scroll = 0
@@ -83,6 +97,8 @@ def main(stdscr):
             cmd = current_input.strip()
 
             if cmd == "/exit":
+                if sio.connected:
+                    sio.disconnect()
                 break
 
             elif cmd == "/clear":
@@ -95,6 +111,8 @@ def main(stdscr):
 
             elif cmd:
                 messages.append(f"[you]: {cmd}")
+                if sio.connected:
+                    sio.emit('chat message', cmd)
                 scroll = 0  
 
             current_input = ""
