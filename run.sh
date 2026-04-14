@@ -24,7 +24,7 @@ SERVER_PID=$!
 sleep 1
 
 # 5. Launch UI
-python3 ui.py
+python3 client.py
 
 # 6. Final Cleanup
 kill $SERVER_PID
