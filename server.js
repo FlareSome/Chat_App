@@ -1,27 +1,24 @@
 const express = require('express');
 const { createServer } = require('node:http');
-const { join } = require('node:path');
 const { Server } = require('socket.io');
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+// Health check endpoint
 app.get('/', (req, res) => {
-  res.json({'username': 'username101',
-            'message': 'hello world'
-  });
+  res.json({'status': 'online', 'server': 'ChatApp_v2'});
 });
-usr_cnt=0
+
 io.on('connection', (socket) => {
-  usr_cnt++;
-  console.log(`user${usr_cnt}: joined`)
+  // Silent connection for TUI stability
   socket.on('chat_message', (msg) => {
-    console.log(msg)
+    // Broadcast to all connected clients
     io.emit('server_response', msg);
   });
 });
 
-server.listen(3000, () => {
-  console.log('server running at http://localhost:3000');
+server.listen(3000, '0.0.0.0', () => {
+  console.log('Chat Server running on http://localhost:3000');
 });

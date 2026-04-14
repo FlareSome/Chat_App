@@ -1,44 +1,43 @@
-# client.py
 import socketio
 
-# Create a Socket.io client instance
+# Create a Socket.IO client
 sio = socketio.Client()
 
+# When connected
 @sio.event
 def connect():
-    print("Successfully connected to the server!")
+    print("Connected to server!")
 
+# When disconnected
 @sio.event
 def disconnect():
-    print("Disconnected from server")
+    print("❌ Disconnected from server")
 
-# Listen for the 'server_response' event
+# Listen for messages from server
 @sio.on("server_response")
 def on_message(data):
-    print("Server says:", data)
+    print(f"{data['user']}: {data['text']}")
 
-# Connect to the Node.js server
-sio.connect("http://localhost:3000")
+def main():
+    username = input("Enter Username: ")
 
-# Emit a message to the 'chat_message' event
-sio.emit("chat_message", {"user": "Python", "text": "Hello from the other side!"})
+    # Connect to server
+    sio.connect("http://localhost:3000")
 
-    print(data["user"],": ",data["text"])
+    print("Start chatting (Ctrl+C to exit)\n")
 
-# Connect to the Node.js server
+    try:
+        while True:
+            message = input()
+            sio.emit("chat_message", {
+                "user": username,
+                "text": message
+            })
+    except KeyboardInterrupt:
+        print("\nExiting chat...")
+        sio.disconnect()
 
-
-# Emit a message to the 'chat_message' event
-username=input("Enter Username: ")
-sio.connect("http://localhost:3000")
-while(True):
-    message = input()
-    print("\033[A\033[K", end="")     
-    sio.emit("chat_message", {"user": username, "text": message})
-
-
-
-
-
-# Keep the connection alive
-sio.wait()
+# Run program
+if __name__ == "__main__":
+    main()
+    sio.wait()
